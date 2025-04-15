@@ -64,9 +64,6 @@ $endif$
 
 $definitions; separator="\n"$
 
-// Implement IRTPSData CSharp Interface for type
-$csharp_interface_implementation(ctx)$
-
 // Include the class interfaces
 %include "$ctx.filename$.hpp"
 
@@ -122,6 +119,7 @@ $struct.members : { member | $member_getters(struct_name=struct.scopedname, memb
     }
 }
 
+$csharp_interface_implementation(ctx)$
 >>
 
 template_sequence_name(typecode) ::= <%
