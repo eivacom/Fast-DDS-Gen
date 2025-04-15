@@ -115,6 +115,9 @@ public class fastddsgen
     // Generate python binding files
     private boolean m_python = false;
 
+    // Generate csharp binding files
+    private boolean m_csharp = false;
+
     private boolean m_case_sensitive = false;
 
     // Testing
@@ -352,6 +355,10 @@ public class fastddsgen
             {
                 m_python = true;
             }
+            else if (arg.equals(csharp_bindings_arg))
+            {
+                m_csharp = true;
+            }
             else if (arg.equals(replace_arg))
             {
                 m_replace = true;
@@ -400,7 +407,10 @@ public class fastddsgen
         {
             throw new BadArgumentException(specific_platform_arg + " and " + python_bindings_arg + " currently are incompatible");
         }
-
+        if (null != m_exampleOption && m_csharp)
+        {
+            throw new BadArgumentException(specific_platform_arg + " and " + csharp_bindings_arg + " currently are incompatible");
+        }
         if (m_idlFiles.isEmpty())
         {
             throw new BadArgumentException("No input files given");
@@ -613,6 +623,7 @@ public class fastddsgen
     private static final String disable_preprocessor_arg = "-ppDisable";
     private static final String preprocessor_path_arg = "-ppPath";
     private static final String python_bindings_arg = "-python";
+    private static final String csharp_bindings_arg = "-csharp";
     private static final String replace_arg = "-replace";
     private static final String temp_dir_arg = "-t";
     private static final String ros2_names_arg = "-typeros2";
@@ -664,6 +675,7 @@ public class fastddsgen
         System.out.println("\t\t" + disable_preprocessor_arg + ": disables the preprocessor.");
         System.out.println("\t\t" + preprocessor_path_arg + ": specifies the preprocessor path.");
         System.out.println("\t\t" + python_bindings_arg + ": generates python bindings for the generated types.");
+        System.out.println("\t\t" + csharp_bindings_arg + ": generates csharp bindings for the generated types.");
         System.out.println("\t\t" + replace_arg + ": replaces existing generated files.");
         System.out.println("\t\t" + temp_dir_arg + " <temp dir>: sets a specific directory as a temporary directory.");
         System.out.println("\t\t" + ros2_names_arg + ": generates type naming compatible with ROS2.");
@@ -863,6 +875,12 @@ public class fastddsgen
                 tmanager.addGroup("com/eprosima/fastdds/idl/templates/DDSPubSubTypeSwigInterface.stg");
             }
 
+            if (m_csharp)
+            {
+                tmanager.addGroup("com/eprosima/fastcdr/idl/templates/CSharpTypesSwigInterface.stg");
+                tmanager.addGroup("com/eprosima/fastdds/idl/templates/DDSPubSubTypeCSharpSwigInterface.stg");
+            }
+
             // Load custom templates into manager
             if (processCustomTemplates)
             {
@@ -959,6 +977,15 @@ public class fastddsgen
                         {
                         }
                     }
+                    if (m_csharp)
+                    {
+                        System.out.println("Generating Swig interface files for csharp...");
+                        if (returnedValue =
+                                Utils.writeFile(output_dir + ctx.getFilename() + ".i",
+                                    maintemplates.getTemplate("com/eprosima/fastcdr/idl/templates/CSharpTypesSwigInterface.stg"), m_replace))
+                        {
+                        }
+                    }
                 }
 
                 if (m_test)
@@ -1045,6 +1072,13 @@ public class fastddsgen
                                 returnedValue &= Utils.writeFile(
                                         output_dir + ctx.getFilename() + "PubSubTypes.i",
                                         maintemplates.getTemplate("com/eprosima/fastdds/idl/templates/DDSPubSubTypeSwigInterface.stg"), m_replace);
+                            }
+                            if (m_csharp)
+                            {
+                                System.out.println("Generating Swig interface files for csharp...");
+                                returnedValue &= Utils.writeFile(
+                                        output_dir + ctx.getFilename() + "PubSubTypes.i",
+                                        maintemplates.getTemplate("com/eprosima/fastdds/idl/templates/DDSPubSubTypeCSharpSwigInterface.stg"), m_replace);
                             }
                         }
 
