@@ -21,14 +21,6 @@ $fileHeader(ctx=ctx, file=[ctx.filename, ".i"], description=["This header file c
 
 %module(directors="1", threads="1") $ctx.filename$
 
-// If using windows in debug, it would try to use python_d, which would not be found.
-%begin %{
-#ifdef _MSC_VER
-#define SWIG_PYTHON_INTERPRETER_NO_DEBUG
-#endif
-#include <exception>
-%}
-
 // SWIG helper modules
 %include "stdint.i"
 %include "std_array.i"
