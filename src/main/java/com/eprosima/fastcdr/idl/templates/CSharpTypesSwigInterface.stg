@@ -19,7 +19,7 @@ import "com/eprosima/fastdds/idl/templates/eprosima.stg"
 main(ctx, definitions) ::= <<
 $fileHeader(ctx=ctx, file=[ctx.filename, ".i"], description=["This header file contains the SWIG interface of the described types in the IDL file."])$
 
-%module(moduleimport="if __import__('os').name == 'nt': import win32api; win32api.LoadLibrary('$ctx.filename$.dll')\nif __package__ or '.' in __name__:\n    from . import _$ctx.filename$Wrapper\nelse:\n    import _$ctx.filename$Wrapper") $ctx.filename$
+%module(directors="1", threads="1") $ctx.filename$
 
 // If using windows in debug, it would try to use python_d, which would not be found.
 %begin %{
@@ -62,19 +62,10 @@ $endif$
 %import(module="fastdds") "fastdds/dds/core/LoanableTypedCollection.hpp"
 %import(module="fastdds") "fastdds/dds/core/LoanableSequence.hpp"
 
-%define %traits_penumn(Type...)
-  %fragment(SWIG_Traits_frag(Type),"header",
-        fragment="StdTraits") {
-namespace swig {
-  template <> struct traits< Type > {
-    typedef value_category category;
-    static const char* type_name() { return  #Type; }
-  };
-}
-}
-%enddef
-
 $definitions; separator="\n"$
+
+// Implement IRTPSData CSharp Interface for type
+$csharp_interface_implementation(ctx)$
 
 // Include the class interfaces
 %include "$ctx.filename$.hpp"
@@ -89,6 +80,17 @@ fast_macro_declarations() ::= <<
 // Any macro used on the Fast DDS header files will give an error if it is not redefined here
 #define FASTDDS_EXPORTED_API
 #define eProsima_user_DllExport
+>>
+
+csharp_interface_implementation(ctx) ::= <<
+%typemap(csinterfaces) $ctx.m_lastStructureTopicDataTypeName$ %{ global::System.IDisposable, IRTPSData %}
+%typemap(cscode) $ctx.m_lastStructureTopicDataTypeName$
+%{
+  public IntPtr GetHandle()
+  {
+      return swigCPtr.Handle;
+  }
+%}
 >>
 
 struct_type(ctx, parent, struct, extensions, member_list) ::= <<
@@ -109,12 +111,12 @@ $struct.members : { member | $member_getters(struct_name=struct.scopedname, memb
 %template($struct.name$Seq) eprosima::fastdds::dds::LoanableSequence<$struct.scopedname$, std::false_type>;
 %extend eprosima::fastdds::dds::LoanableSequence<$struct.scopedname$, std::false_type>
 {
-    size_t __len__() const
+    size_t Count() const
     {
         return self->length();
     }
 
-    const $struct.scopedname$& __getitem__(size_t i) const
+    const $struct.scopedname$& At(size_t i) const
     {
         return (*self)[i];
     }
@@ -239,5 +241,4 @@ bitset_type(ctx, parent, bitset, extensions) ::= <<
 
 // Enums are ported as constants in the target language
 enum_type(ctx, parent, enum) ::= <<
-%traits_penumn(enum $enum.cppTypename$);
 >>
