@@ -75,7 +75,7 @@ csharp_interface_implementation(ctx) ::= <<
 %typemap(csinterfaces) $ctx.m_lastStructureTopicDataTypeName$ %{ global::System.IDisposable, IRTPSData %}
 %typemap(cscode) $ctx.m_lastStructureTopicDataTypeName$
 %{
-  public IntPtr GetHandle()
+  public global::System.IntPtr GetHandle()
   {
       return swigCPtr.Handle;
   }
