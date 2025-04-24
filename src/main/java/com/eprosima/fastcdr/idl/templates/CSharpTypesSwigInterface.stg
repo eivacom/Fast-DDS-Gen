@@ -54,6 +54,11 @@ $endif$
 %import(module="fastdds") "fastdds/dds/core/LoanableTypedCollection.hpp"
 %import(module="fastdds") "fastdds/dds/core/LoanableSequence.hpp"
 
+%typemap(csimports) SWIGTYPE 
+%{
+using FastDDS;
+%}
+
 $definitions; separator="\n"$
 
 // Include the class interfaces
