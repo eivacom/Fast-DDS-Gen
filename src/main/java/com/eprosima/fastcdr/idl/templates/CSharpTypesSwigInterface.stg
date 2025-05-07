@@ -28,8 +28,9 @@ $fileHeader(ctx=ctx, file=[ctx.filename, ".i"], description=["This header file c
 %include "std_string.i"
 %include "std_vector.i"
 %include "typemaps.i"
+%include "arrays_csharp.i"
 
-// Assignemt operators are ignored, as there is no such thing in Python.
+// Assignemt operators are ignored, as there is no such thing in csharp.
 // Trying to export them issues a warning
 %ignore *::operator=;
 
@@ -93,11 +94,11 @@ $member_list$
 // Binding for class $struct.scopedname$
 ////////////////////////////////////////////////////////
 
-// Ignore overloaded methods that have no application on Python
+// Ignore overloaded methods that have no application on csharp
 // Otherwise they will issue a warning
 %ignore $struct.scopedname$::$struct.name$($struct.scopedname$&&);
 
-// Overloaded getter methods shadow each other and are equivalent in python
+// Overloaded getter methods shadow each other and are equivalent in csharp
 // Avoid a warning ignoring all but one
 $struct.members : { member | $member_getters(struct_name=struct.scopedname, member=member)$}; separator="\n"$
 
@@ -132,12 +133,21 @@ $if(typecode.contentTypeCode.isSequenceType)$
 $template_sequence(typecode.contentTypeCode)$
 $elseif(typecode.contentTypeCode.primitive)$
 $if(!typecode.contentTypeCode.isType_7)$
+%csmethodmodifiers std::vector<$typecode.contentTypeCode.cppTypename$>::copy_buffer "private";
 %extend std::vector<$typecode.contentTypeCode.cppTypename$>
 {
-    const $typecode.contentTypeCode.cppTypename$* get_buffer() const
-    {
-        return self->data();
-    }
+	%apply $typecode.contentTypeCode.cppTypename$ INOUT[] {$typecode.contentTypeCode.cppTypename$* target_buffer }
+	void copy_buffer($typecode.contentTypeCode.cppTypename$* target_buffer) const {
+		std::memcpy(target_buffer, self->data(), self->size());
+	}
+}
+%typemap(cscode) std::vector<$typecode.contentTypeCode.cppTypename$>
+{
+  public \$typemap(cstype, $typecode.contentTypeCode.cppTypename$)[] ToArrayCopy() {
+    \$typemap(cstype, $typecode.contentTypeCode.cppTypename$)[] array = new \$typemap(cstype, $typecode.contentTypeCode.cppTypename$)[this.Count];
+    this.copy_buffer(array);
+    return array;
+  }
 }
 $endif$
 $endif$
@@ -165,7 +175,7 @@ $else$
 $endif$
 
 
-// Overloaded getter methods shadow each other and are equivalent in python
+// Overloaded getter methods shadow each other and are equivalent in csharp
 // Const accesors produced constant enums instead of arrays/dictionaries when used
 // We ignore them to prevent this
 $if(member.typecode.isSequenceType)$
@@ -212,11 +222,11 @@ $switch_type$
 // Binding for class $union.name$
 ////////////////////////////////////////////////////////
 
-// Ignore overloaded methods that have no application on Python
+// Ignore overloaded methods that have no application on csharp
 // Otherwise they will issue a warning
 %ignore $union.name$::$union.name$($union.name$&&);
 
-// Overloaded getter methods shadow each other and are equivalent in python
+// Overloaded getter methods shadow each other and are equivalent in csharp
 // Avoid a warning ignoring all but one
 %ignore $union.name$::_d() const;
 $union.members : { member | $member_getters(struct_name=union.name, member=member)$}; separator="\n"$
@@ -228,7 +238,7 @@ bitset_type(ctx, parent, bitset, extensions) ::= <<
 // Binding for class $bitset.name$
 ////////////////////////////////////////////////////////
 
-// Ignore overloaded methods that have no application on Python
+// Ignore overloaded methods that have no application on csharp
 // Otherwise they will issue a warning
 %ignore $bitset.name$::$bitset.name$($bitset.name$&&);
 
