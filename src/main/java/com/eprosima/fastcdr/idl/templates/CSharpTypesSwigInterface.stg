@@ -137,7 +137,7 @@ $if(!typecode.contentTypeCode.isType_7)$
 {
 	%apply $typecode.contentTypeCode.cppTypename$ INOUT[] {$typecode.contentTypeCode.cppTypename$* target_buffer }
 	void copy_buffer($typecode.contentTypeCode.cppTypename$* target_buffer) const {
-		std::memcpy(target_buffer, self->data(), self->size());
+		std::memcpy(target_buffer, self->data(), self->size() * sizeof($typecode.contentTypeCode.cppTypename$));
 	}
 }
 %typemap(cscode) std::vector<$typecode.contentTypeCode.cppTypename$>
