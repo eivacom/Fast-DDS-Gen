@@ -24,18 +24,19 @@ $fileHeader(ctx=ctx,  file=[ctx.filename, "PubSubTypes.i"], description=["This h
 %import(module="fastdds") "fastdds/rtps/common/InstanceHandle.hpp";
 %import(module="fastdds") "fastdds/rtps/common/SerializedPayload.hpp";
 
-%typemap(csimports) SWIGTYPE 
-%{
-using FastDDS;
-%}
-
 %{
 #include "$ctx.filename$PubSubTypes.hpp"
 %}
 
 #define FASTDDS_GEN_API_VER 3
 %csmethodmodifiers *::is_plain "public override";
-
+$definitions; separator="\n"$
 %include "$ctx.filename$PubSubTypes.hpp"
+
+>>
+
+struct_type(ctx, parent, struct, extensions, member_list) ::= <<
+$member_list$
+%typemap(csimports) $struct.scopedname$PubSubType %{ using FastDDS; %}
 
 >>
