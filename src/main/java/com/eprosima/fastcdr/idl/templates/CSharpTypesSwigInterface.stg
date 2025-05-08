@@ -55,11 +55,6 @@ $endif$
 %import(module="fastdds") "fastdds/dds/core/LoanableTypedCollection.hpp"
 %import(module="fastdds") "fastdds/dds/core/LoanableSequence.hpp"
 
-%typemap(csimports) SWIGTYPE 
-%{
-using FastDDS;
-%}
-
 $definitions; separator="\n"$
 
 // Include the class interfaces
@@ -94,6 +89,8 @@ $member_list$
 // Binding for class $struct.scopedname$
 ////////////////////////////////////////////////////////
 
+%typemap(csimports) $struct.scopedname$ %{ using FastDDS; %}
+
 // Ignore overloaded methods that have no application on csharp
 // Otherwise they will issue a warning
 %ignore $struct.scopedname$::$struct.name$($struct.scopedname$&&);
@@ -101,6 +98,8 @@ $member_list$
 // Overloaded getter methods shadow each other and are equivalent in csharp
 // Avoid a warning ignoring all but one
 $struct.members : { member | $member_getters(struct_name=struct.scopedname, member=member)$}; separator="\n"$
+
+%typemap(csimports) eprosima::fastdds::dds::LoanableTypedCollection<$struct.scopedname$, std::false_type> %{ using FastDDS; %}
 
 %template(_$struct.name$Seq) eprosima::fastdds::dds::LoanableTypedCollection<$struct.scopedname$, std::false_type>;
 %template($struct.name$Seq) eprosima::fastdds::dds::LoanableSequence<$struct.scopedname$, std::false_type>;
