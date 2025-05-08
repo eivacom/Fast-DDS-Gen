@@ -141,13 +141,13 @@ $if(!typecode.contentTypeCode.isType_7)$
 	}
 }
 %typemap(cscode) std::vector<$typecode.contentTypeCode.cppTypename$>
-{
+%{
   public \$typemap(cstype, $typecode.contentTypeCode.cppTypename$)[] ToArrayCopy() {
     \$typemap(cstype, $typecode.contentTypeCode.cppTypename$)[] array = new \$typemap(cstype, $typecode.contentTypeCode.cppTypename$)[this.Count];
     this.copy_buffer(array);
     return array;
   }
-}
+%}
 $endif$
 $endif$
 
