@@ -60,9 +60,11 @@ $definitions; separator="\n"$
 // Include the class interfaces
 %include "$ctx.filename$.hpp"
 
+$if(ctx.existsLastStructure)$
 // Include the corresponding TopicDataType
 %include "$ctx.filename$PubSubTypes.i"
 $"\n"$
+$endif$
 >>
 
 fast_macro_declarations() ::= <<
