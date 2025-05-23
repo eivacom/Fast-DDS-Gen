@@ -1,0 +1,28 @@
+# Dockerfile for Fast DDS Gen on Windows (stripped base)
+FROM docker:windowsservercore-ltsc2025
+
+# Install OpenJDK 11 (using a prebuilt zip distribution)
+RUN curl.exe -L -o C:/openjdk.zip https://github.com/adoptium/temurin11-binaries/releases/download/jdk-11.0.23+9/OpenJDK11U-jdk_x64_windows_hotspot_11.0.23_9.zip
+RUN powershell -Command "Expand-Archive -Path C:/openjdk.zip -DestinationPath C:/ ; Move-Item C:/jdk-11.0.23+9 C:/openjdk-11 ; Remove-Item C:/openjdk.zip"
+
+# Create working directory
+WORKDIR C:/fastddsgen
+
+# Copy project files
+COPY . C:/fastddsgen/
+
+# Set default shell
+SHELL ["cmd", "/S", "/C"]
+
+# Set environment variables for Java
+ENV JAVA_HOME=C:/openjdk-11
+ENV PATH=%JAVA_HOME%/bin;%PATH%
+
+# Build the project
+RUN C:/fastddsgen/gradlew.bat assemble
+
+
+# Default command
+CMD ["cmd"]
+
+# To run fastddsgen, use: scripts\fastddsgen.bat
