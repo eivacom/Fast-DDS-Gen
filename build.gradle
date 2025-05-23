@@ -96,16 +96,18 @@ dependencies {
     testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.5.2')
 }
 
-task submodulesUpdate(type: Exec) {
-    description 'Updates (and inits) git submodules'
-    commandLine 'git', 'submodule', 'update', '--init'
-}
-
 task buildIDLParser(type: GradleBuild) {
     dir = 'thirdparty/idl-parser'
     tasks = ['clean', 'build']
+    doFirst {
+        if (!file('thirdparty/idl-parser').exists()) {
+            println "Submodule 'thirdparty/idl-parser' does not exist. Initializing submodule..."
+            exec {
+                commandLine 'git', 'submodule', 'update', '--init', 'thirdparty/idl-parser'
+            }
+        }
+    }
 }
-buildIDLParser.dependsOn submodulesUpdate
 
 task copyResources {
     // Copy platforms file

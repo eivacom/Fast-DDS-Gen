@@ -1,0 +1,25 @@
+FROM ubuntu:20.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install dependencies
+RUN apt-get update && \
+    apt-get install -y openjdk-11-jdk \
+    git \
+    && \ 
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /home/fastddsgen
+
+WORKDIR /home/fastddsgen
+
+COPY . /home/fastddsgen/
+
+RUN ./gradlew assemble
+
+CMD [ "/bin/bash" ]
+
+## Do this as entrypoint?
+# execution the file is ./script/fastddsgen
+
+
