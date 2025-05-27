@@ -16,6 +16,7 @@ package com.eprosima.fastdds.solution;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.stream.Collectors;
 
 import com.eprosima.solution.GUIDGenerator;
 import com.eprosima.fastdds.idl.grammar.Context;
@@ -37,6 +38,7 @@ public class Project extends com.eprosima.solution.Project
         m_jniincludefiles = new ArrayList<String>();
         m_idlincludefiles = new ArrayList<String>();
         m_idlincludefiles.addAll((LinkedHashSet<String>)dependencies);
+        m_idlinterfacefiles = new ArrayList<String>();
         ctx_ = ctx;
     }
 
@@ -214,6 +216,21 @@ public class Project extends com.eprosima.solution.Project
         return m_idlincludefiles;
     }
 
+    public void addIDLInterfaceFile(String file)
+    {
+        m_idlinterfacefiles.add(file.replace("\\", "/"));
+    }
+
+    public ArrayList<String> getIDLInterfaceFiles()
+    {
+        return m_idlinterfacefiles;
+    }
+    public ArrayList<String> getCommonSrcFilesUnixStyle() {
+        return getCommonSrcFiles().stream()
+        .map(s -> s.replace("\\", "/"))
+        .collect(Collectors.toCollection(ArrayList::new));
+    }
+    
     public Context getContext()
     {
         return ctx_;
@@ -231,6 +248,7 @@ public class Project extends com.eprosima.solution.Project
     private ArrayList<String> m_jnisrcfiles = null;
     private ArrayList<String> m_jniincludefiles = null;
     private ArrayList<String> m_idlincludefiles = null;
+    private ArrayList<String> m_idlinterfacefiles = null;
     String m_guid = null;
 
     private Context ctx_ = null;

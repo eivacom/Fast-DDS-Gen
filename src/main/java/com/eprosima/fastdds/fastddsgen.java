@@ -512,6 +512,11 @@ public class fastddsgen
                 returnedValue = genSwigCMake(solution);
             }
 
+            if (returnedValue && m_csharp)
+            {
+                returnedValue = genSwigCSharpCMake(solution);
+                returnedValue = genSwigCSharpInterface(solution);
+            }
 
             // Generate solution
             if (returnedValue && (m_exampleOption != null) || m_test)
@@ -984,6 +989,7 @@ public class fastddsgen
                                 Utils.writeFile(output_dir + ctx.getFilename() + ".i",
                                     maintemplates.getTemplate("com/eprosima/fastcdr/idl/templates/CSharpTypesSwigInterface.stg"), m_replace))
                         {
+                            project.addIDLInterfaceFile(relative_dir + ctx.getFilename() + ".i");
                         }
                     }
                 }
@@ -1436,6 +1442,46 @@ public class fastddsgen
             swig.add("solution", solution);
 
             returnedValue = Utils.writeFile(m_outputDir + "CMakeLists.txt", swig, m_replace);
+
+        }
+        return returnedValue;
+    }
+
+    private boolean genSwigCSharpCMake(
+            Solution solution)
+    {
+
+        boolean returnedValue = false;
+        ST swig = null;
+
+        STGroupFile swigTemplates = new STGroupFile("com/eprosima/fastdds/idl/templates/SwigCSharpCMake.stg", '$', '$');
+        if (swigTemplates != null)
+        {
+            swig = swigTemplates.getInstanceOf("swig_cmake");
+
+            swig.add("solution", solution);
+
+            returnedValue = Utils.writeFile(m_outputDir + "CMakeLists.txt", swig, m_replace);
+
+        }
+        return returnedValue;
+    }
+
+    private boolean genSwigCSharpInterface(
+            Solution solution)
+    {
+
+        boolean returnedValue = false;
+        ST swig = null;
+
+        STGroupFile swigTemplates = new STGroupFile("com/eprosima/fastdds/idl/templates/SwigCSharpInterface.stg", '$', '$');
+        if (swigTemplates != null)
+        {
+            swig = swigTemplates.getInstanceOf("swig_interface");
+
+            swig.add("solution", solution);
+
+            returnedValue = Utils.writeFile(m_outputDir + "eprosima_fastdds_idl.i", swig, m_replace);
 
         }
         return returnedValue;

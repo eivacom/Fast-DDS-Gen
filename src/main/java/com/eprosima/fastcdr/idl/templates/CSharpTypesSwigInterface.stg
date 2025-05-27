@@ -39,7 +39,7 @@ $fast_macro_declarations()$
 $ctx.directIncludeDependencies : {include | %include "$include$.i"}; separator="\n"$
 
 %{
-#include "$ctx.filename$.hpp"
+#include "$ctx.relativeDir$$ctx.filename$.hpp"
 
 #include <fastdds/dds/core/LoanableSequence.hpp>
 %}
