@@ -35,7 +35,6 @@ import com.eprosima.idl.parser.tree.Interface;
 import com.eprosima.idl.parser.tree.TypeDeclaration;
 import com.eprosima.idl.parser.typecode.Kind;
 import com.eprosima.idl.parser.typecode.TypeCode;
-import com.eprosima.idl.util.Util;
 import com.eprosima.idl.parser.typecode.Member;
 import com.eprosima.idl.parser.typecode.MemberedTypeCode;
 import com.eprosima.log.ColorMessage;
@@ -75,7 +74,7 @@ public class Context extends com.eprosima.idl.context.Context implements com.epr
         m_subscribercode = subscribercode;
         m_publishercode = publishercode;
         m_randomGenNames = new Stack<String>();
-        m_relativeDir = Util.getIDLFileDirectoryOnly(file);
+        m_relativeDir = getRelativeDir(file);
         // TODO Remove
         m_appProduct = appProduct;
         //m_protocol = protocol;
