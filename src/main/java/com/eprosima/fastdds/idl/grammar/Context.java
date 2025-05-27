@@ -35,6 +35,7 @@ import com.eprosima.idl.parser.tree.Interface;
 import com.eprosima.idl.parser.tree.TypeDeclaration;
 import com.eprosima.idl.parser.typecode.Kind;
 import com.eprosima.idl.parser.typecode.TypeCode;
+import com.eprosima.idl.util.Util;
 import com.eprosima.idl.parser.typecode.Member;
 import com.eprosima.idl.parser.typecode.MemberedTypeCode;
 import com.eprosima.log.ColorMessage;
@@ -74,7 +75,7 @@ public class Context extends com.eprosima.idl.context.Context implements com.epr
         m_subscribercode = subscribercode;
         m_publishercode = publishercode;
         m_randomGenNames = new Stack<String>();
-
+        m_relativeDir = Util.getIDLFileDirectoryOnly(file);
         // TODO Remove
         m_appProduct = appProduct;
         //m_protocol = protocol;
@@ -89,7 +90,10 @@ public class Context extends com.eprosima.idl.context.Context implements com.epr
         keyann.addMember(new AnnotationMember(Annotation.value_str, new PrimitiveTypeCode(Kind.KIND_BOOLEAN), Annotation.true_str));
 
     }
-
+    public String getRelativeDir() 
+    {
+        return m_relativeDir.replace("\\", "/");
+    }
     public void setTypelimitation(
             String lt)
     {
@@ -581,6 +585,8 @@ public class Context extends com.eprosima.idl.context.Context implements com.epr
     // Stores if the user will generate the server source.
     private boolean m_publishercode = true;
 
+    private String m_relativeDir = "";
+
     // TODO Remove
     private String m_appProduct = null;
 
@@ -655,6 +661,11 @@ public class Context extends com.eprosima.idl.context.Context implements com.epr
             return true;
         }
         return false;
+    }
+
+    public boolean getExistsLastStructure()
+    {
+        return existsLastStructure();
     }
 
     private String m_fileNameUpper = null;
