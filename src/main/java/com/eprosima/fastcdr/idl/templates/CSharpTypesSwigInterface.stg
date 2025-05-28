@@ -223,6 +223,8 @@ $switch_type$
 // Binding for class $union.name$
 ////////////////////////////////////////////////////////
 
+%nspace $union.scopedname$; // Use C++ Namespace in C#
+
 // Ignore overloaded methods that have no application on csharp
 // Otherwise they will issue a warning
 %ignore $union.name$::$union.name$($union.name$&&);
@@ -239,6 +241,8 @@ bitset_type(ctx, parent, bitset, extensions) ::= <<
 // Binding for class $bitset.name$
 ////////////////////////////////////////////////////////
 
+%nspace $bitset.scopedname$; // Use C++ Namespace in C#
+
 // Ignore overloaded methods that have no application on csharp
 // Otherwise they will issue a warning
 %ignore $bitset.name$::$bitset.name$($bitset.name$&&);
@@ -247,4 +251,5 @@ bitset_type(ctx, parent, bitset, extensions) ::= <<
 
 // Enums are ported as constants in the target language
 enum_type(ctx, parent, enum) ::= <<
+    %nspace $enum.scopedname$; // Use C++ Namespace in C#
 >>
