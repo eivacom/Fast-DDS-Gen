@@ -91,7 +91,6 @@ $member_list$
 // Binding for class $struct.scopedname$
 ////////////////////////////////////////////////////////
 %nspace $struct.scopedname$; // Use C++ Namespace in C#
-%nspace $struct.scope$;
 
 %typemap(csimports) $struct.scopedname$ %{ using FastDDS; %}
 
@@ -104,6 +103,9 @@ $member_list$
 $struct.members : { member | $member_getters(struct_name=struct.scopedname, member=member)$}; separator="\n"$
 
 %typemap(csimports) eprosima::fastdds::dds::LoanableTypedCollection<$struct.scopedname$, std::false_type> %{ using FastDDS; %}
+
+%nspacemove($struct.scope$) eprosima::fastdds::dds::LoanableTypedCollection<$struct.scopedname$, std::false_type>;
+%nspacemove($struct.scope$) eprosima::fastdds::dds::LoanableSequence<$struct.scopedname$, std::false_type>;
 
 %template(_$struct.name$Seq) eprosima::fastdds::dds::LoanableTypedCollection<$struct.scopedname$, std::false_type>;
 %template($struct.name$Seq) eprosima::fastdds::dds::LoanableSequence<$struct.scopedname$, std::false_type>;
