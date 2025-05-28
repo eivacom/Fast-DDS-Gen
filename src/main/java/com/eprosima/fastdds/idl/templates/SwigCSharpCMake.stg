@@ -15,8 +15,9 @@
 group SwigCMake;
 
 swig_cmake(solution) ::= <<
-project(FastDDSIDLWrapper)
 cmake_minimum_required(VERSION 3.20)
+project(FastDDSIDLWrapper)
+
 
 find_package(fastcdr REQUIRED)
 find_package(fastdds 3 REQUIRED)
