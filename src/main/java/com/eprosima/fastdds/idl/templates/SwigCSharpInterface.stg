@@ -18,6 +18,7 @@ swig_interface(solution) ::= <<
 // Auto-generated master SWIG interface
 %module(directors="1", threads="1") csharp_fastdds_idl 
 
+%apply void *VOID_INT_PTR { void * }
 
 $solution.projects : { project | $subproject_generated_interface_files(project)$}; separator="\n"$
 
