@@ -251,5 +251,5 @@ bitset_type(ctx, parent, bitset, extensions) ::= <<
 
 // Enums are ported as constants in the target language
 enum_type(ctx, parent, enum) ::= <<
-    %nspace $enum.scopedname$; // Use C++ Namespace in C#
+%nspace $enum.scopedname$; // Use C++ Namespace in C#
 >>
