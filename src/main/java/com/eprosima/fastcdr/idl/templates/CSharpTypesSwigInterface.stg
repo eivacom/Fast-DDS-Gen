@@ -90,7 +90,7 @@ $member_list$
 ////////////////////////////////////////////////////////
 // Binding for class $struct.scopedname$
 ////////////////////////////////////////////////////////
-
+%nspace $struct.scopedname$; // Use C++ Namespace in C#
 %typemap(csimports) $struct.scopedname$ %{ using FastDDS; %}
 
 // Ignore overloaded methods that have no application on csharp
