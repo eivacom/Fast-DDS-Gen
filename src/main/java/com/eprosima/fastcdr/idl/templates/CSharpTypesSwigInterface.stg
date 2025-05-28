@@ -124,6 +124,8 @@ $csharp_interface_implementation(ctx)$
 template_sequence_name(typecode) ::= <%
 $if(typecode.isSequenceType)$
 $template_sequence_name(typecode.contentTypeCode)$_vector
+$elseif(typecode.isStringType && typecode.isBounded)$
+fixed_string_$typecode.maxsize$_vector
 $else$
 $typecode.noScopedCppTypename$_vector
 $endif$
