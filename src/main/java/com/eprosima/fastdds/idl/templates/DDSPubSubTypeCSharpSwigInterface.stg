@@ -28,6 +28,8 @@ $fileHeader(ctx=ctx,  file=[ctx.filename, "PubSubTypes.i"], description=["This h
 #include "$ctx.relativeDir$$ctx.filename$PubSubTypes.hpp"
 %}
 
+%nspace $struct.scopedname$; // Use C++ Namespace in C#
+
 #define FASTDDS_GEN_API_VER 3
 %csmethodmodifiers *::is_plain "public override";
 $definitions; separator="\n"$
