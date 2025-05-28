@@ -39,7 +39,7 @@ $definitions; separator="\n"$
 
 struct_type(ctx, parent, struct, extensions, member_list) ::= <<
 $member_list$
-%nspace $struct.scopedname$; // Use C++ Namespace in C#
+%nspace $struct.scopedname$PubSubType; // Use C++ Namespace in C#
 %typemap(csimports) $struct.scopedname$PubSubType %{ using FastDDS; %}
 
 >>
