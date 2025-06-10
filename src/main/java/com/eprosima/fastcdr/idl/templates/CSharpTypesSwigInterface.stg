@@ -75,7 +75,7 @@ fast_macro_declarations() ::= <<
 >>
 
 csharp_interface_implementation(ctx) ::= <<
-%typemap(csinterfaces) $ctx.m_lastStructureTopicDataTypeName$ %{ global::System.IDisposable, FastDDS.IRTPSData %}
+%typemap(csinterfaces) $ctx.m_lastStructureTopicDataTypeName$ %{ global::System.IDisposable, global::FastDDS.IRTPSData %}
 %typemap(cscode) $ctx.m_lastStructureTopicDataTypeName$
 %{
   public global::System.IntPtr GetHandle()
