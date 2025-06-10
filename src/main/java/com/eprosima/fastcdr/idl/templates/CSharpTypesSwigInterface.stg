@@ -157,7 +157,7 @@ $if(!typecode.contentTypeCode.isType_7)$
   }
 %}
 $endif$
-$else$
+$elseif(!typecode.contentTypeCode.isStringType)$
 %nspacemove($struct.scope$) std::vector<$if(typecode.contentTypeCode.isEnumType)$enum $endif$$typecode.contentTypeCode.cppTypename$>;
 $endif$
 
