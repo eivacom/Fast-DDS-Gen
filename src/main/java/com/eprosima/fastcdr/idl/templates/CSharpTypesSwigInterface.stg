@@ -157,6 +157,8 @@ $if(!typecode.contentTypeCode.isType_7)$
   }
 %}
 $endif$
+$else$
+%nspacemove($struct.scope$) std::vector<$if(typecode.contentTypeCode.isEnumType)$enum $endif$$typecode.contentTypeCode.cppTypename$>;
 $endif$
 
 %template($template_sequence_name(typecode.contentTypeCode)$) std::vector<$if(typecode.contentTypeCode.isEnumType)$enum $endif$$typecode.contentTypeCode.cppTypename$>;
