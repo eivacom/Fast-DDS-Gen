@@ -1,0 +1,49 @@
+# version: '3.8'
+
+services:
+  # fastddsgen-linux:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.linux
+  #   image: fastddsgen-linux:latest
+  #   container_name: fastddsgen-linux
+  #   tty: true
+  #   volumes:
+  #     - ${OUTPUT_FOLDER:-./outputFolder}:/home/fastddsgen/outputFolder
+  #     - ${INPUT_FOLDER:-./inputFolder}:/homefastddsgen/inputFolder
+  #   # environment:
+  #     # - OUTPUT_FOLDER=/home/fastddsgen/output
+  #     # - FASTDDSGEN_ARGS=${FASTDDSGEN_ARGS}
+  #   entrypoint: ["/bin/bash", "-c", "./scripts/fastddsgen -d /home/fastddsgen/outputFolder /home/fastddsgen/inputFolder/Temperature.idl"]
+
+  # fastddsgen-windows:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.windows
+  #   image: fastddsgen-windows:latest
+  #   container_name: fastddsgen-windows
+  #   tty: true
+  #   volumes:
+  #     - ${OUTPUT_FOLDER:-.\outputFolder}:C:\fastddsgen\output
+  #   environment:
+  #     - OUTPUT_FOLDER=C:\fastddsgen\output
+  #     # - FASTDDSGEN_ARGS=${FASTDDSGEN_ARGS}
+  #   # entrypoint: ["cmd", "/C", "C:\\scripts\\fastddsgen.bat -d C:\\fastddsgen\\output %FASTDDSGEN_ARGS%"]
+  #   # Note: Windows containers require Docker to be in Windows mode
+
+
+  #NOTE: this is from eprosima pulled (wget) from their website
+  ubuntu-fastddsgen-eprosima:
+    image: ubuntu-fastdds:v3.2.2
+    container_name: ubuntu-fastdds-eprosima
+    tty: true
+    volumes:
+      - ${OUTPUT_FOLDER:-./outputFolder}:/home/fastddsgen/outputFolder
+      - ${INPUT_FOLDER:-./inputFolder}:/home/fastddsgen/inputFolder
+    entrypoint: ["/bin/bash", "-c", "fastddsgen -d /home/fastddsgen/outputFolder /home/fastddsgen/inputFolder/*"]
+
+# Usage:
+#   OUTPUT_FOLDER=$(pwd)/myoutput FASTDDSGEN_ARGS="-input HelloWorld.idl" docker compose up <service-name>
+#   OUTPUT_FOLDER=C:/absolute/path/on/windows $env:FASTDDSGEN_ARGS="-input HelloWorld.idl" docker compose up <service-name>
+#
+# The container will exit after running the command, and output will be in the specified host folder.
