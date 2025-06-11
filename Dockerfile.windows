@@ -11,16 +11,16 @@ WORKDIR C:/fastddsgen
 # Copy project files
 COPY . C:/fastddsgen/
 
+RUN mkdir C:/OutPutFolderForFastDdsGen > $null 
+
 # Set default shell
 SHELL ["cmd", "/S", "/C"]
 
 # Set environment variables for Java
-ENV JAVA_HOME=C:/openjdk-11
-ENV PATH=%JAVA_HOME%/bin;%PATH%
+RUN [Environment]::SetEnvironmentVariable("JAVA_HOME", "C:/openjdk-11")   
 
 # Build the project
 RUN C:/fastddsgen/gradlew.bat assemble
-
 
 # Default command
 CMD ["cmd"]
