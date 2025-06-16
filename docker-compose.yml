@@ -34,8 +34,8 @@ services:
 
   #NOTE: this is from eprosima pulled (wget) from their website
   ubuntu-fastddsgen-eprosima:
-    image: ubuntu-fastdds:v3.2.2
-    container_name: ubuntu-fastdds-eprosima
+    image: eiva-fastdds/ubuntu-fastdds:v3.2.2
+    container_name: ubuntu-fastdds
     tty: true
     volumes:
       - ${OUTPUT_FOLDER:-./outputFolder}:/home/fastddsgen/outputFolder
