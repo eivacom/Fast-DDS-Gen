@@ -15,7 +15,10 @@ RUN apt-get update && \
     automake \
     bison \
     libffi-dev \
-    libtool 
+    libtool \
+    cmake \
+    openjdk-11-jdk \
+    git
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
     
@@ -29,6 +32,22 @@ RUN cd /tmp && \
     make -j$(nproc) && \
     make install && \
     cd / && rm -rf /tmp/swig-4.3.0 /tmp/v4.3.0.tar.gz
+
+RUN mkdir -p /home/fastddsgen
+
+WORKDIR /home/fastddsgen
+
+COPY . /home/fastddsgen/
+
+RUN mkdir -p /home/fastddsgen/outputFolder
+RUN mkdir -p /home/fastddsgen/inputFolder
+
+RUN ./gradlew assemble
+
+RUN mkdir -p /usr/local/share/fastddsgen/java/ && \ 
+    cp /home/fastddsgen/share/fastddsgen/java/fastddsgen.jar /usr/local/share/fastddsgen/java/fastddsgen.jar && \
+    cp /home/fastddsgen/scripts/fastddsgen /usr/local/bin/fastddsgen
+
 
 
 CMD ["/bin/bash"]
