@@ -22,7 +22,7 @@ project(FastDDSIDLWrapper)
 find_package(fastcdr REQUIRED)
 find_package(fastdds 3 REQUIRED)
 
-find_package(SWIG REQUIRED CONFIG)
+find_package(SWIG REQUIRED)
 include(UseSWIG)
 set(CMAKE_SWIG_FLAGS "")
 
@@ -71,7 +71,7 @@ target_include_directories(\${PROJECT_NAME} PUBLIC
 )
 target_link_libraries(\${PROJECT_NAME}
     fastcdr
-    fastdds::fastdds
+    fastdds
     )
 
 >>

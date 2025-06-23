@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.22)
+cmake_minimum_required(VERSION 3.27)
 project(FastDDSIdlWrapper)
 find_package(fastdds CONFIG REQUIRED) # Is this line needed?
 find_program(FASTDDSGEN fastddsgen)
@@ -8,8 +8,8 @@ if (NOT FASTDDSGEN)
 	message(FATAL_ERROR "fastddsgen not found. Please install Fast DDS and add it to your PATH.")
 endif()
 
-set(GENERATED_TYPE_SUPPORT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/generated/)
-set(IDL_FILES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/inputFolder/)
+set(GENERATED_TYPE_SUPPORT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/outputFolder)
+set(IDL_FILES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/inputFolder)
 file(GLOB_RECURSE IDL_FILES ${IDL_FILES_DIR}/*.idl)
 
 set(ALL_GENERATED_FILES "")
@@ -45,9 +45,9 @@ add_dependencies(eiva_custom_idl generate_fastdds_code)
 
 target_include_directories(eiva_custom_idl 
         PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/generated>
+        $<BUILD_INTERFACE:${GENERATED_TYPE_SUPPORT_DIR}>
         PRIVATE
         $<BUILD_INTERFACE:${GENERATED_TYPE_SUPPORT_DIR}>
 )
 
-target_link_libraries(eiva_custom_idl PUBLIC fastdds::fastdds)
+target_link_libraries(eiva_custom_idl PUBLIC fastdds)

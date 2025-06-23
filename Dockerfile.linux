@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 # We can't use this -> ubuntu-fastdds:v3.2.2 right now because 
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -18,10 +18,61 @@ RUN apt-get update && \
     libtool \
     cmake \
     openjdk-11-jdk \
+    libasio-dev \
+    libtinyxml2-dev \
+    mingw-w64 \
+    # openssl \
+    libssl-dev \
     git
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# For do C# wrapper, it depends on Fast CDR + Fast DDS
+RUN mkdir -p /home/Fast-DDS-dependencies
+
+# Fast-DDS section --- the branch version is taking from fast-dds-python (https://github.com/eProsima/Fast-DDS-python/blob/v2.2.0/fastdds_python.repos)
+WORKDIR /home/Fast-DDS-dependencies
+RUN cd /home/Fast-DDS-dependencies && \
+    git clone --depth 1 --branch v1.3.1 --single-branch https://github.com/eProsima/foonathan_memory_vendor.git && \
+    mkdir -p /home/Fast-DDS-dependencies/foonathan_memory_vendor/build && \
+    cd /home/Fast-DDS-dependencies/foonathan_memory_vendor/build && \
+    cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local/ -DBUILD_SHARED_LIBS=ON && \
+    cmake --build . --target install -j$(nproc)
+
+# Fast-CDR section 
+ RUN cd /home/Fast-DDS-dependencies && \
+    git clone --depth 1 --branch v2.3.0 --single-branch https://github.com/eProsima/Fast-CDR.git && \
+    mkdir -p /home/Fast-DDS-dependencies/Fast-CDR/build && \
+    cd /home/Fast-DDS-dependencies/Fast-CDR/build && \
+    cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local/ -DBUILD_SHARED_LIBS=ON && \
+    cmake --build . --target install -j$(nproc)
+
+# Install all dependencies
+RUN cd /home/Fast-DDS-dependencies && \
+    git clone --depth 1 --branch v3.1.0 --single-branch https://github.com/eProsima/Fast-DDS.git && \
+    mkdir -p /home/Fast-DDS-dependencies/Fast-DDS/build && \
+    cd /home/Fast-DDS-dependencies/Fast-DDS/build && \
+    cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local/ -DBUILD_SHARED_LIBS=ON && \
+    cmake --build . --target install -j$(nproc) 
     
+# Creating symbolic linking due to CMakeLists expect the CamelCase format - We don't want to modify the CMakeLists.txt for that
+RUN cd /usr/local/share/fastdds/cmake && \
+    ln -s fastdds-config.cmake fastddsConfig.cmake && \
+    ln -s fastdds-config-version.cmake fastddsConfigVersion.cmake && \
+    ln -s fastdds-shared-targets.cmake fastddsTargets.cmake
+
+RUN cd /tmp && \
+    wget https://www.openssl.org/source/openssl-3.0.13.tar.gz && \
+    tar -xzf openssl-3.0.13.tar.gz && \
+    cd openssl-3.0.13 && \
+    export PATH=/usr/bin:$PATH && \
+    export CROSS_COMPILE=x86_64-w64-mingw32- && \
+    ./Configure mingw64 no-shared --cross-compile-prefix=${CROSS_COMPILE} && \
+    make -j$(nproc) && \
+    make DESTDIR=/opt/openssl-mingw install 
+
+# 
+
 # Build and install SWIG 4.3.0 from source
 RUN cd /tmp && \
     wget https://github.com/swig/swig/archive/refs/tags/v4.3.0.tar.gz && \
@@ -33,6 +84,7 @@ RUN cd /tmp && \
     make install && \
     cd / && rm -rf /tmp/swig-4.3.0 /tmp/v4.3.0.tar.gz
 
+# Fast-DDS-Gen section
 RUN mkdir -p /home/fastddsgen
 
 WORKDIR /home/fastddsgen
@@ -48,6 +100,13 @@ RUN mkdir -p /usr/local/share/fastddsgen/java/ && \
     cp /home/fastddsgen/share/fastddsgen/java/fastddsgen.jar /usr/local/share/fastddsgen/java/fastddsgen.jar && \
     cp /home/fastddsgen/scripts/fastddsgen /usr/local/bin/fastddsgen
 
+# Building the IDLs with fastddsgen
+RUN cmake -S . -B build-fastddsgen/   -DCMAKE_BUILD_TYPE=Release   -DBUILD_SHARED_LIBS=OFF  -DCMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH}:/usr/local/share/fastdds/cmake/" && \
+    cmake --build build-fastddsgen/ -j$(nproc)
+
+# Linux build
+RUN cmake -S ./outputFolder/ -B csharp-build/ -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DCMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH}:/usr/local/share/fastdds/cmake/" && \
+    cmake --build csharp-build/ -j$(nproc)
 
 
 CMD ["/bin/bash"]
