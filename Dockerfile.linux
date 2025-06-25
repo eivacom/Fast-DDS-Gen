@@ -27,52 +27,125 @@ RUN apt-get update && \
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
+
+COPY . /home/fastddsgen/
+
 # For do C# wrapper, it depends on Fast CDR + Fast DDS
-RUN mkdir -p /home/Fast-DDS-dependencies
+# RUN mkdir -p /home/Fast-DDS-dependencies
 
 # Fast-DDS section --- the branch version is taking from fast-dds-python (https://github.com/eProsima/Fast-DDS-python/blob/v2.2.0/fastdds_python.repos)
-WORKDIR /home/Fast-DDS-dependencies
-RUN cd /home/Fast-DDS-dependencies && \
-    git clone --depth 1 --branch v1.3.1 --single-branch https://github.com/eProsima/foonathan_memory_vendor.git && \
-    mkdir -p /home/Fast-DDS-dependencies/foonathan_memory_vendor/build && \
-    cd /home/Fast-DDS-dependencies/foonathan_memory_vendor/build && \
-    cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local/ -DBUILD_SHARED_LIBS=ON && \
-    cmake --build . --target install -j$(nproc)
+# WORKDIR /home/Fast-DDS-dependencies
+# RUN cd /home/Fast-DDS-dependencies && \
+#     git clone --depth 1 --branch v1.3.1 --single-branch https://github.com/eProsima/foonathan_memory_vendor.git && \
+#     mkdir -p /home/Fast-DDS-dependencies/foonathan_memory_vendor/build && \
+#     cd /home/Fast-DDS-dependencies/foonathan_memory_vendor/build && \
+#     cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local/ -DBUILD_SHARED_LIBS=ON && \
+#     cmake --build . --target install -j$(nproc)
 
-# Fast-CDR section 
- RUN cd /home/Fast-DDS-dependencies && \
-    git clone --depth 1 --branch v2.3.0 --single-branch https://github.com/eProsima/Fast-CDR.git && \
-    mkdir -p /home/Fast-DDS-dependencies/Fast-CDR/build && \
-    cd /home/Fast-DDS-dependencies/Fast-CDR/build && \
-    cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local/ -DBUILD_SHARED_LIBS=ON && \
-    cmake --build . --target install -j$(nproc)
+# # Fast-CDR section 
+#  RUN cd /home/Fast-DDS-dependencies && \
+#     git clone --depth 1 --branch v2.3.0 --single-branch https://github.com/eProsima/Fast-CDR.git && \
+#     mkdir -p /home/Fast-DDS-dependencies/Fast-CDR/build && \
+#     cd /home/Fast-DDS-dependencies/Fast-CDR/build && \
+#     cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local/ -DBUILD_SHARED_LIBS=ON && \
+#     cmake --build . --target install -j$(nproc)
 
-# Install all dependencies
-RUN cd /home/Fast-DDS-dependencies && \
-    git clone --depth 1 --branch v3.1.0 --single-branch https://github.com/eProsima/Fast-DDS.git && \
-    mkdir -p /home/Fast-DDS-dependencies/Fast-DDS/build && \
-    cd /home/Fast-DDS-dependencies/Fast-DDS/build && \
-    cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local/ -DBUILD_SHARED_LIBS=ON && \
-    cmake --build . --target install -j$(nproc) 
-    
-# Creating symbolic linking due to CMakeLists expect the CamelCase format - We don't want to modify the CMakeLists.txt for that
-RUN cd /usr/local/share/fastdds/cmake && \
-    ln -s fastdds-config.cmake fastddsConfig.cmake && \
-    ln -s fastdds-config-version.cmake fastddsConfigVersion.cmake && \
-    ln -s fastdds-shared-targets.cmake fastddsTargets.cmake
+# # Install all dependencies
+# RUN cd /home/Fast-DDS-dependencies && \
+#     git clone --depth 1 --branch v3.1.0 --single-branch https://github.com/eProsima/Fast-DDS.git && \
+#     mkdir -p /home/Fast-DDS-dependencies/Fast-DDS/build && \
+#     cd /home/Fast-DDS-dependencies/Fast-DDS/build && \
+#     cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local/ -DBUILD_SHARED_LIBS=ON && \
+#     cmake --build . --target install -j$(nproc) 
 
+# RUN wget https://github.com/niXman/mingw-builds-binaries/releases/download/openssl-3.0.13/openssl-3.0.13-x64_64-win64-seh.zip && \
+#     unzip openssl-3.0.13-x64_64-win64-seh.zip -d /home/fastddsgen/openssl-mingw && \
+#     rm openssl-3.0.13-x64_64-win64-seh.zip
+
+# Cross-compile and install foonathan_memory_vendor for Windows
+# RUN cd /home/Fast-DDS-dependencies-windows && \
+#      git clone --depth 1 --branch v1.3.1 --single-branch https://github.com/eProsima/foonathan_memory_vendor.git && \
+#      mkdir -p /home/Fast-DDS-dependencies-windows/foonathan_memory_vendor/build-mingw && \
+#      cd /home/Fast-DDS-dependencies-windows/foonathan_memory_vendor/build-mingw && \
+#      cmake .. \
+#      -DCMAKE_TOOLCHAIN_FILE=/home/fastddsgen/mingw-toolchain.cmake \
+#      -DCMAKE_INSTALL_PREFIX=/opt/fastdds-mingw \
+#      -DBUILD_SHARED_LIBS=OFF && \
+#      cmake --build . --target install -j$(nproc)
+
+# RUN cd /tmp && \
+#     git clone --branch v0.7-3 --depth 1 https://github.com/foonathan/memory.git && \
+#     mkdir -p /tmp/memory/build-mingw && \
+#     # find /tmp/memory -name 'CMakeLists.txt' -exec sed -i 's/-Werror//g' {} + && \
+#     # sed -i '/#warning/{N;d;}' /tmp/memory/src/temporary_allocator.cpp && \
+#     cd /tmp/memory/build-mingw && \
+#     cmake .. \
+#     -DCMAKE_TOOLCHAIN_FILE=/home/fastddsgen/mingw-toolchain.cmake \
+#     -DCMAKE_INSTALL_PREFIX=/opt/fastdds-mingw \
+#     -DCMAKE_CXX_FLAGS="-Wno-error=cpp" \
+#     -DBUILD_SHARED_LIBS=OFF && \
+#     cmake --build . --target install -j$(nproc)
+
+RUN cd /tmp && \ 
+    git clone --depth 1 --branch v1.3.1 https://github.com/eProsima/foonathan_memory_vendor.git && \
+    mkdir -p /tmp/foonathan_memory_vendor/build-mingw && \
+    cd /tmp/foonathan_memory_vendor/build-mingw &&
+
+
+RUN mkdir -p /opt/openssl-mingw/
 RUN cd /tmp && \
     wget https://www.openssl.org/source/openssl-3.0.13.tar.gz && \
     tar -xzf openssl-3.0.13.tar.gz && \
     cd openssl-3.0.13 && \
     export PATH=/usr/bin:$PATH && \
     export CROSS_COMPILE=x86_64-w64-mingw32- && \
-    ./Configure mingw64 no-shared --cross-compile-prefix=${CROSS_COMPILE} && \
+    ./Configure mingw64 no-shared --cross-compile-prefix=${CROSS_COMPILE} --prefix=/opt/openssl-mingw && \
     make -j$(nproc) && \
-    make DESTDIR=/opt/openssl-mingw install 
+    make install 
 
-# 
+RUN mkdir -p /home/Fast-DDS-dependencies-windows  
+# # Cross-compile and install Fast-CDR for Windows
+RUN cd /home/Fast-DDS-dependencies-windows && \
+    git clone --depth 1 --branch v2.3.0 --single-branch https://github.com/eProsima/Fast-CDR.git && \
+    sed -i '/FastCdr.rc/d' /home/Fast-DDS-dependencies-windows/Fast-CDR/src/cpp/CMakeLists.txt && \
+    mkdir -p /home/Fast-DDS-dependencies-windows/Fast-CDR/build-mingw && \
+    cd /home/Fast-DDS-dependencies-windows/Fast-CDR/build-mingw && \
+    cmake .. \
+    -DCMAKE_TOOLCHAIN_FILE=/home/fastddsgen/mingw-toolchain.cmake \
+    -DCMAKE_INSTALL_PREFIX=/opt/fastdds-mingw \
+    -DBUILD_SHARED_LIBS=OFF && \
+    cmake --build . --target install -j$(nproc)
 
+# # # Cross-compile and install tinyxml2 for Windows
+RUN cd /home/Fast-DDS-dependencies-windows && \
+    git clone --depth 1 --branch 9.0.0 --single-branch https://github.com/leethomason/tinyxml2.git && \
+    mkdir -p /home/Fast-DDS-dependencies-windows/tinyxml2/build-mingw && \
+    cd /home/Fast-DDS-dependencies-windows/tinyxml2/build-mingw && \
+    cmake .. \
+    -DCMAKE_TOOLCHAIN_FILE=/home/fastddsgen/mingw-toolchain.cmake \
+    -DCMAKE_INSTALL_PREFIX=/opt/fastdds-mingw \
+    -DBUILD_SHARED_LIBS=OFF && \
+    cmake --build . --target install -j$(nproc)
+
+# # Cross-compile and install Fast-DDS for Windows
+RUN cd /home/Fast-DDS-dependencies-windows && \
+    git clone --depth 1 --branch v3.1.0 --single-branch https://github.com/eProsima/Fast-DDS.git && \
+    mkdir -p /home/Fast-DDS-dependencies-windows/Fast-DDS/build-mingw && \
+    cd /home/Fast-DDS-dependencies-windows/Fast-DDS/build-mingw && \
+    cmake .. \
+    -DCMAKE_TOOLCHAIN_FILE=/home/fastddsgen/mingw-toolchain.cmake \
+    -DCMAKE_INSTALL_PREFIX=/opt/fastdds-mingw \
+    -DBUILD_SHARED_LIBS=OFF \
+    -DCMAKE_PREFIX_PATH="/opt/fastdds-mingw" && \
+    cmake --build . --target install -j$(nproc)
+
+# Creating symbolic linking due to CMakeLists expect the CamelCase format - We don't want to modify the CMakeLists.txt for that
+RUN cd /usr/local/share/fastdds/cmake && \
+    ln -s fastdds-config.cmake fastddsConfig.cmake && \
+    ln -s fastdds-config-version.cmake fastddsConfigVersion.cmake && \
+    ln -s fastdds-shared-targets.cmake fastddsTargets.cmake
+
+   
 # Build and install SWIG 4.3.0 from source
 RUN cd /tmp && \
     wget https://github.com/swig/swig/archive/refs/tags/v4.3.0.tar.gz && \
@@ -89,8 +162,6 @@ RUN mkdir -p /home/fastddsgen
 
 WORKDIR /home/fastddsgen
 
-COPY . /home/fastddsgen/
-
 RUN mkdir -p /home/fastddsgen/outputFolder
 RUN mkdir -p /home/fastddsgen/inputFolder
 
@@ -101,12 +172,38 @@ RUN mkdir -p /usr/local/share/fastddsgen/java/ && \
     cp /home/fastddsgen/scripts/fastddsgen /usr/local/bin/fastddsgen
 
 # Building the IDLs with fastddsgen
-RUN cmake -S . -B build-fastddsgen/   -DCMAKE_BUILD_TYPE=Release   -DBUILD_SHARED_LIBS=OFF  -DCMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH}:/usr/local/share/fastdds/cmake/" && \
+RUN cmake -S . -B build-fastddsgen/ \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DBUILD_SHARED_LIBS=OFF \
+    -DCMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH}:/usr/local/share/fastdds/cmake/" && \
     cmake --build build-fastddsgen/ -j$(nproc)
 
 # Linux build
-RUN cmake -S ./outputFolder/ -B csharp-build/ -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DCMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH}:/usr/local/share/fastdds/cmake/" && \
+RUN cmake -S ./outputFolder/ -B csharp-build/ \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DBUILD_SHARED_LIBS=OFF \
+    -DCMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH}:/usr/local/share/fastdds/cmake/" && \
     cmake --build csharp-build/ -j$(nproc)
+
+# Windows build
+RUN cmake -S ./outputFolder/ -B csharp-build-windows/ \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DBUILD_SHARED_LIBS=OFF \
+    -DCMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH}:/usr/local/share/fastdds/cmake/" \
+    -DOPENSSL_ROOT_DIR=/opt/openssl-mingw \
+    -DOPENSSL_USE_STATIC_LIBS=TRUE \
+    -DCMAKE_TOOLCHAIN_FILE=/home/fastddsgen/mingw-toolchain.cmake && \
+    cmake --build csharp-build-windows/ -j$(nproc)
+
+# # Windows build using MinGW cross-compiled dependencies - I don't know if this can be used?
+# RUN cmake -S ./outputFolder/ -B csharp-build-windows/ \
+#     -DCMAKE_BUILD_TYPE=Release \
+#     -DBUILD_SHARED_LIBS=OFF \
+#     -DCMAKE_PREFIX_PATH="/opt/fastdds-mingw;/opt/openssl-mingw/usr/local" \
+#     -DCMAKE_TOOLCHAIN_FILE=/home/fastddsgen/mingw-toolchain.cmake \
+#     -DOPENSSL_ROOT_DIR=/opt/openssl-mingw/usr/local \
+#     -DOPENSSL_USE_STATIC_LIBS=TRUE && \
+#     cmake --build csharp-build-windows/ -j$(nproc)
 
 
 CMD ["/bin/bash"]
