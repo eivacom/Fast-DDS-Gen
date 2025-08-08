@@ -74,6 +74,17 @@ target_link_libraries(\${PROJECT_NAME}
     fastdds::fastdds
     )
 
+install(TARGETS ${PROJECT_NAME}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    )
+
+
+# Get the SWIG support files directory
+get_property(SWIG_OUTPUT_DIR TARGET ${PROJECT_NAME} PROPERTY SWIG_SUPPORT_FILES_DIRECTORY)
+install(DIRECTORY ${SWIG_OUTPUT_DIR}/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ FILES_MATCHING PATTERN "*.cs")
+
 >>
 
 subproject_generated_src_files(project) ::= <<
